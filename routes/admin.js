@@ -10,7 +10,13 @@ products = []; // create an empty array for products
 // /admin/add-product => GET
 router.get('/add-product', (req, res, next)=>{ 
     console.log('Middleware add product');
-    res.render('add-product', {PageTitle:'Add Product', path: '/admin/add-product'}) // send a response to the client
+    res.render('add-product', {
+        PageTitle:'Add Product', 
+        path: '/admin/add-product',
+        formCSS: true,
+        productCSS: true,
+        ActiveAddProduct: true,
+    }) // send a response to the client
 })
 
 // /admin/add-product => POST

@@ -13,7 +13,15 @@ user.get('/', (req, res, next)=>{
    /*  console.log(admindata.products); // log the products array from the admin routes
     res.sendFile(path.join(mainDir, 'views', 'shop.html')); // send a response to the client */
     const products = admindata.products; // get the products array from the admin routes
-    res.render('shop', {prods: products, PageTitle:'Shop', path:'/'})// render the shop view
+    res.render('shop', {
+        prods: products, 
+        PageTitle:'Shop', 
+        path:'/', 
+        hasProducts: products.length>0,
+        ActiveShop: true,
+        productCSS: true,
+        //layout: false // use this to disable the default layout
+    })// render the shop view
 }) 
 
 module.exports = user; // export the router
