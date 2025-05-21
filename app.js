@@ -15,6 +15,7 @@ const ShopRoutes = require('./routes/shop'); // import the shop routes
 
 
 app.use(bodyParser.urlencoded({extended: false})); // use body-parser middleware to parse the request body
+
 app.use(express.static(path.join(__dirname, 'public'))); // serve static files from the public directory
 
 app.use('/admin', adminRoutes); // use the admin routes for any request that starts with /admin

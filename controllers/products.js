@@ -25,11 +25,8 @@ exports.postAddProduct = (req, res, next)=>{
 
 
 exports.getProducts = (req, res, next)=>{ 
-   /*  console.log(admindata.products); // log the products array from the admin routes
-    res.sendFile(path.join(mainDir, 'views', 'shop.html')); // send a response to the client */
-    const products = Product.fetchAll(); // fetch all products from the product model
-    console.log(products); // log the products array
-    res.render('shop', {
+    Product.fetchAll((products)=>{ // fetch all products from the product model
+        res.render('shop', {
         prods: products, 
         PageTitle:'Shop', 
         path:'/', 
@@ -38,5 +35,7 @@ exports.getProducts = (req, res, next)=>{
         productCSS: true,
         //layout: false // use this to disable the default layout
     })// render the shop view
+    }); // fetch all products from the product model
+    
 }
 
