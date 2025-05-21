@@ -2,26 +2,11 @@ const express = require('express'); // import express
 
 const path = require('path'); // import path
 
-const mainDir = require('../helper/path'); // import the main directory path
+const productsController = require('../controllers/product'); // import the product controller
 
-const admindata = require('./admin'); // import the admin routes
-
-const user = express.Router();
+const router = express.Router();
 
 
-user.get('/', (req, res, next)=>{ 
-   /*  console.log(admindata.products); // log the products array from the admin routes
-    res.sendFile(path.join(mainDir, 'views', 'shop.html')); // send a response to the client */
-    const products = admindata.products; // get the products array from the admin routes
-    res.render('shop', {
-        prods: products, 
-        PageTitle:'Shop', 
-        path:'/', 
-        hasProducts: products.length>0,
-        ActiveShop: true,
-        productCSS: true,
-        //layout: false // use this to disable the default layout
-    })// render the shop view
-}) 
+router.get('/', productsController.getProducts); // use the getProducts method from the product controller) 
 
-module.exports = user; // export the router
+module.exports = router; // export the router
