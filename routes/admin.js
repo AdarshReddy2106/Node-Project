@@ -4,7 +4,7 @@ const path = require('path'); // import path
 
 const router = express.Router(); // create a router instance
 
-const productsController = require('../controllers/product'); // import the product controller
+const productsController = require('../controllers/products'); // import the product controller
 
 // /admin/add-product => GET
 router.get('/add-product',productsController.getAddProduct); // use the getAddProduct method from the product controller)

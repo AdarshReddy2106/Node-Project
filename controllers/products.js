@@ -1,6 +1,4 @@
-const e = require("express");
-
-const products = []; // create an empty array for products
+const Product = require('../models/product'); // import the Product model
 
 exports.getAddProduct = (req, res, next)=>{ 
     console.log('Middleware add product');
@@ -16,9 +14,12 @@ exports.getAddProduct = (req, res, next)=>{
 
 
 exports.postAddProduct = (req, res, next)=>{
-    products.push({ // add a new product to the products array
+    /* products.push({ // add a new product to the products array
         title: req.body.title, // get the title from the request body
-    });
+    }); */
+
+    const product = new Product(req.body.title); // create a new product instance
+    product.save(); // save the product instance to the products array
     res.redirect('/'); // redirect to the home page
 }   
 
@@ -26,6 +27,8 @@ exports.postAddProduct = (req, res, next)=>{
 exports.getProducts = (req, res, next)=>{ 
    /*  console.log(admindata.products); // log the products array from the admin routes
     res.sendFile(path.join(mainDir, 'views', 'shop.html')); // send a response to the client */
+    const products = Product.fetchAll(); // fetch all products from the product model
+    console.log(products); // log the products array
     res.render('shop', {
         prods: products, 
         PageTitle:'Shop', 
