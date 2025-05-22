@@ -1,5 +1,7 @@
 const fs = require('fs'); // import the file system module
 const path = require('path'); // import the path module
+
+
 const p = path.join(
         path.dirname(require.main.filename), 
         'data', 
@@ -49,6 +51,17 @@ module.exports = class Cart {
             fs.writeFile(p, JSON.stringify(updatedCart), err => { // write the updated cart to the file
                 console.log(err); // log any errors
             });
+        });
+    }
+
+    static getCart(cb) {
+        fs.readFile(p, (err, fileContent) => { // read the cart file
+            const cart = JSON.parse(fileContent); // parse the file content to JSON
+            if (err) { // if there is an error
+                cb(null); // return null
+            } else {
+                cb(cart); // return the cart
+            }
         });
     }
 }

@@ -17,6 +17,8 @@ router.get('/cart', shopController.getCart); // use the getCart method from the 
 
 router.post('/cart', shopController.postCart);
 
+router.post('/cart-delete-item', shopController.postCartDeleteProduct); 
+
 router.get('/orders', shopController.getOrders); // use the getOrders method from the shop controller
 
 router.get('/checkout', shopController.getCheckout); // use the getCheckout method from the shop controller

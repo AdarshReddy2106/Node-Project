@@ -11,15 +11,16 @@ exports.getAddProduct = (req, res, next)=>{
 
 
 
-exports.postAddProduct = (req, res, next)=>{
-    const title = req.body.title; // get the title from the request body
-    const imageUrl = req.body.imageUrl; 
+exports.postAddProduct = (req, res, next) => {
+    const title = req.body.title;
+    const imageUrl = req.body.imageUrl;
     const description = req.body.Description; 
-    const price = req.body.price; 
-    const product = new Product(null, title, imageUrl, description, price); // create a new product instance
-    product.save(); // save the product instance to the products array
-    res.redirect('/'); // redirect to the home page
-} 
+    const price = req.body.price;
+    const Product = require('../models/product');
+    const product = new Product(null, title, imageUrl, description, price);
+    product.save();
+    res.redirect('/admin/products');
+};
 
 exports.postEditProduct = (req, res, next) => {
         const product = new Product(
