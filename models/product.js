@@ -2,12 +2,14 @@ const path = require('path'); // import the path module
 const fs = require('fs'); // import the file system module
 const { get } = require('http');
 
+const Cart = require('./cart'); // import the cart module
+
 let products = []; // create an empty array to store the products
 
-    const p = path.join(
-        path.dirname(require.main.filename), 
-        'data', 
-        'products.json'); // create a path to the products.json file
+const p = path.join(
+    path.dirname(require.main.filename), 
+    'data', 
+    'products.json'); // create a path to the products.json file
 
 const getProductsFromFile = cb =>{
     fs.readFile(p, (err, fileContent) => { // read the products.json file
@@ -55,6 +57,18 @@ module.exports = class Product {
                 });
             }
         });
+    }
+    static deleteById(id) { 
+        getProductsFromFile(products => {
+            const product = products.find(p => p.id === id); // find the product with the given id
+            const updatedProducts = products.filter(product => product.id !== id); // filter out the product with the given id
+            fs.writeFile(p, JSON.stringify(updatedProducts), err => { // write the updated products array to the file
+                if (!err) {
+                    Cart.deleteProduct(id, product.price); // delete the product from the cart
+                    console.log('Product deleted successfully'); // log success message
+                }
+            }); 
+        })
     }
 
     static fetchAll(cb) {

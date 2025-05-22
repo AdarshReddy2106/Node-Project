@@ -10,15 +10,15 @@ const adminController = require('../controllers/admin'); // import the admin con
 router.get('/add-product',adminController.getAddProduct); // use the getAddProduct method from the admin controller)
 
 // /admin/products => GET
-router.get('/products' , adminController.getProducts); // use the getProducts method from the admin controller)
+router.get('/products' , adminController.getProducts); 
 
 // /admin/add-product => POST
-router.post('/add-product',adminController.postAddProduct); // use the postAddProduct method from the admin controller)
+router.post('/add-product',adminController.postAddProduct); 
 
 router.post('/edit-product', adminController.postEditProduct); // use the postEditProduct method from the admin controller)
 
 router.get('/edit-product/:productId', adminController.getEditProduct); // use the getEditProduct method from the admin controller)
 
-
+router.post('/delete-product', adminController.postDeleteProduct); 
 
 module.exports = router; // export the router instance
