@@ -19,7 +19,8 @@ const getProductsFromFile = cb =>{
 }
 
 module.exports = class Product {
-    constructor(title, imageUrl, description, price) { // constructor to create a new product
+    constructor(id, title, imageUrl, description, price) { // constructor to create a new product
+        this.id = id; // set the id of the product
         this.title = title;
         this.imageUrl = imageUrl;
         this.description = description; 
@@ -27,12 +28,32 @@ module.exports = class Product {
     }
 
     save() {
-        this.id = Math.random().toString(); // generate a random id for the product
+        
         getProductsFromFile(products => { // get the products from the file
-            products.push(this); // add the new product to the products array
-            fs.writeFile(p, JSON.stringify(products), (err) => { // write the products array to the file
-                console.log(err); // log any errors
-            });
+            if (this.id) { // if the product has an id
+                const existingProductIndex = products.findIndex(prod => prod.id === this.id); // find the index of the existing product
+                if (existingProductIndex >= 0) {
+                    const updatedProducts = [...products]; // create a copy of the products array
+                    updatedProducts[existingProductIndex] = this; // update the existing product with the new product
+                    fs.writeFile(p, JSON.stringify(updatedProducts), err => { // write the updated products array to the file
+                        console.log(err); // log any errors
+                    });
+                } else {
+                    // If not found, treat as new product
+                    this.id = Math.random().toString(); // generate a random id for the product
+                    products.push(this); // add the new product to the products array
+                    fs.writeFile(p, JSON.stringify(products), err => { // write the products array to the file
+                        console.log(err); // log any errors
+                    });
+                }
+            }   
+            else { // if the product does not have an id
+                this.id = Math.random().toString(); // generate a random id for the product
+                products.push(this); // add the new product to the products array
+                fs.writeFile(p, JSON.stringify(products), err => { // write the products array to the file
+                    console.log(err); // log any errors
+                });
+            }
         });
     }
 

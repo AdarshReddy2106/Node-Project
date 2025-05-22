@@ -15,6 +15,10 @@ router.get('/products' , adminController.getProducts); // use the getProducts me
 // /admin/add-product => POST
 router.post('/add-product',adminController.postAddProduct); // use the postAddProduct method from the admin controller)
 
+router.post('/edit-product', adminController.postEditProduct); // use the postEditProduct method from the admin controller)
+
+router.get('/edit-product/:productId', adminController.getEditProduct); // use the getEditProduct method from the admin controller)
+
 
 
 module.exports = router; // export the router instance
