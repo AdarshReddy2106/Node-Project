@@ -1,24 +1,6 @@
-const path = require('path'); // import the path module
-const fs = require('fs'); // import the file system module
-const { get } = require('http');
-
+const db = require('../helper/database'); // import the database module
 const Cart = require('./cart'); // import the cart module
 
-let products = []; // create an empty array to store the products
-
-const p = path.join(
-    path.dirname(require.main.filename), 
-    'data', 
-    'products.json'); // create a path to the products.json file
-
-const getProductsFromFile = cb =>{
-    fs.readFile(p, (err, fileContent) => { // read the products.json file
-        if (err) { // if there is an error
-            return cb([]); // return an empty array
-        }
-        cb(JSON.parse(fileContent)); // parse the file content to JSON and return it
-    });
-}
 
 module.exports = class Product {
     constructor(id, title, imageUrl, description, price) { // constructor to create a new product
@@ -30,55 +12,19 @@ module.exports = class Product {
     }
 
     save() {
-        
-        getProductsFromFile(products => { // get the products from the file
-            if (this.id) { // if the product has an id
-                const existingProductIndex = products.findIndex(prod => prod.id === this.id); // find the index of the existing product
-                if (existingProductIndex >= 0) {
-                    const updatedProducts = [...products]; // create a copy of the products array
-                    updatedProducts[existingProductIndex] = this; // update the existing product with the new product
-                    fs.writeFile(p, JSON.stringify(updatedProducts), err => { // write the updated products array to the file
-                        console.log(err); // log any errors
-                    });
-                } else {
-                    // If not found, treat as new product
-                    this.id = Math.random().toString(); // generate a random id for the product
-                    products.push(this); // add the new product to the products array
-                    fs.writeFile(p, JSON.stringify(products), err => { // write the products array to the file
-                        console.log(err); // log any errors
-                    });
-                }
-            }   
-            else { // if the product does not have an id
-                this.id = Math.random().toString(); // generate a random id for the product
-                products.push(this); // add the new product to the products array
-                fs.writeFile(p, JSON.stringify(products), err => { // write the products array to the file
-                    console.log(err); // log any errors
-                });
-            }
-        });
+        return db.execute('INSERT INTO products (title, price, imageUrl, description) VALUES (?, ?, ?, ?)',
+        [this.title, this.price, this.imageUrl, this.description]) // execute the SQL query to insert a new product 
     }
+
     static deleteById(id) { 
-        getProductsFromFile(products => {
-            const product = products.find(p => p.id === id); // find the product with the given id
-            const updatedProducts = products.filter(product => product.id !== id); // filter out the product with the given id
-            fs.writeFile(p, JSON.stringify(updatedProducts), err => { // write the updated products array to the file
-                if (!err) {
-                    Cart.deleteProduct(id, product.price); // delete the product from the cart
-                    console.log('Product deleted successfully'); // log success message
-                }
-            }); 
-        })
+    
     }
 
-    static fetchAll(cb) {
-        getProductsFromFile(cb); // static method to fetch all products
+    static fetchAll() {
+        return db.execute('SELECT * FROM products') // execute the SQL query to fetch all products
     }
 
-    static findById(id, cb) { // static method to find a product by id
-        getProductsFromFile(products => { // get the products from the file
-            const product = products.find(p => p.id === id); // find the product with the given id
-            cb(product); // return the product
-        });
+    static findById(id) {
+        return db.execute('SELECT * FROM products WHERE products.id = ?', [id]) // execute the SQL query to find a product by id
     }
 }

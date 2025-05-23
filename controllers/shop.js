@@ -3,35 +3,47 @@ const Cart = require('../models/cart'); // import the Cart model
 
 
 exports.getProducts = (req, res, next)=>{ 
-    Product.fetchAll((products)=>{ // fetch all products from the product model
+    Product.fetchAll()
+    .then(([rows, fieldData]) => {
         res.render('shop/product-list', {
-        prods: products, 
+        prods: rows, 
         PageTitle:'All Products', 
         path:'/products', 
-    })// render the shop view
-    }); // fetch all products from the product model
+        })// render the shop view
+    })
+    .catch(err => console.log(err)); // fetch all products from the product model    
 }
+
 
 exports.getProduct = (req, res, next)=>{
     const prodId = req.params.productId; // get the product id from the request parameters
-    Product.findById(prodId, (product)=>{ // find the product by id
-        res.render('shop/product-detail', {
-            product: product, // pass the product to the view
-            PageTitle: product.title, // set the page title to the product title
-            path:'/products', // set the path to /products
-        });
-    })
+    Product.findById(prodId)
+    .then(
+        ([product])=> {
+            res.render('shop/product-detail', {
+                product: product[0], // pass the product
+                PageTitle: product[0].title, // set the page title to the product title
+                path: '/products', // set the path to /products
+        }
+            ) // render the product detail view
+        })
+    .catch(
+        err => console.log(err)
+    )
 }
 
 
 exports.getIndex = (req, res, next)=>{
-    Product.fetchAll((products)=>{ // fetch all products from the product model
+    Product.fetchAll()
+    .then(([rows, fieldData]) => {
         res.render('shop/index', {
-        prods: products, 
+        prods: rows, 
         PageTitle:'Shop', 
         path:'/', 
-})
-});
+        })// render the shop view
+    })
+    .catch(err => console.log(err)); // fetch all products from the product model
+    
 }
 
 exports.getCart = ( req, res, next)=>{
