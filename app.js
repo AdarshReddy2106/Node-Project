@@ -3,7 +3,7 @@ const express = require('express'); // import express
 // const routes = require('./routes/admin'); // import the routes
 const bodyParser = require('body-parser'); // import body-parser
 
-const db = require('./helper/database'); // import the database connection
+const sequelize = require('./helper/database'); // import the database connection
 
 const errorController = require('./controllers/error'); // import the controllers
 
@@ -24,6 +24,15 @@ app.use(express.static(path.join(__dirname, 'public'))); // serve static files f
 app.use('/admin', adminRoutes); // use the admin routes for any request that starts with /admin
 app.use(ShopRoutes); // use the shop routes for any request that starts with /shop
 
-app.use(errorController.getErrorPage); // end of middleware 
+app.use(errorController.getErrorPage); // end of middleware
 
-app.listen(2005); // start the server on port 2005
+sequelize.sync().then(
+    result => {
+        // console.log(result);
+        app.listen(2005); // start the server on port 2005
+    }
+).catch(err => {
+    console.log(err);
+}
+) // sync the database
+
