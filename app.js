@@ -3,6 +3,8 @@ const express = require('express'); // import express
 // const routes = require('./routes/admin'); // import the routes
 const bodyParser = require('body-parser'); // import body-parser
 
+const db = require('./helper/database'); // import the database connection
+
 const errorController = require('./controllers/error'); // import the controllers
 
 const app = express(); // create an instance of express
@@ -13,6 +15,14 @@ app.set('views', 'views'); // set the views directory
 const adminRoutes = require('./routes/admin'); // import the admin routes
 const ShopRoutes = require('./routes/shop'); // import the shop routes
 
+db.execute('SELECT * FROM products')
+.then(
+    result => {
+        console.log(result[0], result[1]); // log the result of the query
+    })
+.catch(err=>{
+    console.log(err);
+}); // execute a query to select all products
 
 app.use(bodyParser.urlencoded({extended: false})); // use body-parser middleware to parse the request body
 
