@@ -1,13 +1,17 @@
 const Sequelize = require('sequelize');
 const sequelize = require('../helper/database'); // import the sequelize instance
 
-const Cart = sequelize.define('cart', {
+const CartItem = sequelize.define('cartItem', {
     id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         allowNull: false,
         primaryKey: true
-    }
+    },
+    quantity: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+    },
 });
 
-module.exports = Cart; // export the Cart model so it can be used in other files
+module.exports = CartItem;

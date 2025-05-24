@@ -17,12 +17,13 @@ exports.postAddProduct = (req, res, next) => {
     const description = req.body.description; 
     const price = req.body.price;
     const Product = require('../models/product');
-    Product.create({
-        title: title,
-        price: price,
-        imageUrl: imageUrl,
-        description: description
-    }).then(result => {
+    req.user.createProduct({ 
+        title: title, // create a new product with the given title
+        price: price, // set the price of the product
+        imageUrl: imageUrl, // set the image url of the product
+        description: description // set the description of the product
+    })
+    .then(result => {
         //console.log(result);
         console.log('Created Product'); 
         res.redirect('/admin/products'); // redirect to the admin products page
@@ -39,9 +40,10 @@ exports.getEditProduct = (req, res, next)=>{
         return res.redirect('/'); // redirect to the home page
     }
     const prodId = req.params.productId; // get the product id from the request parameters
-    Product.findByPk(prodId)
-        .then(
-            (product) => { // find the product by id
+    req.user.getProducts({where: {id: prodId}}) // get the products for the user with the given id
+    // Product.findByPk(prodId)
+        .then(products=> { // find the product by id
+        const product = products[0]; // get the first product from the array of products
         if (!product) { // if product is not found
             return res.redirect('/'); // redirect to the home page
         }
@@ -81,7 +83,7 @@ exports.postEditProduct = (req, res, next) => {
 
 
 exports.getProducts = (req, res, next) => {
-    Product.findAll()
+    req.user.getProducts() // get the products for the user
         .then(products=> { // fetch all products from the product model
             res.render('admin/products', {
             prods: products,
