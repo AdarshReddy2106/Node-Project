@@ -26,12 +26,14 @@ app.use(ShopRoutes); // use the shop routes for any request that starts with /sh
 
 app.use(errorController.getErrorPage); // end of middleware
 
-sequelize.sync().then(
+sequelize
+    .sync()
+    .then(
     result => {
         // console.log(result);
         app.listen(2005); // start the server on port 2005
-    }
-).catch(err => {
+    })
+    .catch(err => {
     console.log(err);
 }
 ) // sync the database
