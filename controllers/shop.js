@@ -1,6 +1,5 @@
 const Product = require('../models/product'); // import the Product model
-const Cart = require('../models/cart'); // import the Cart model
-
+const Order = require('../models/order'); // import the Order model
 
 exports.getProducts = (req, res, next)=>{ 
     Product.findAll()
@@ -136,19 +135,53 @@ exports.postCartDeleteProduct = ( req, res, next)=>{
     .catch(err => console.log(err)); // log any errors to the console
 }
 
+
 exports.getOrders = ( req, res, next)=>{
-    res.render('shop/orders', {
+    req.user
+    .getOrders({ include: ['products'] }) // get the orders for the user, including the products
+    .then(orders =>{
+        res.render('shop/orders', {
         path:'/orders',
         PageTitle:'Your Orders',
-    }
+        orders: orders // pass the orders to the view
+    })
+})
+    .catch(err=>(console.log(err))
+    
 ); // render the cart view  
-}   
+}  
 
-exports.getCheckout = ( req, res, next)=>{
-    res.render('shop/checkout', {
-        path:'/checkout',
-        PageTitle:'Checkout',
-    }
-); // render the checkout view  
+
+exports.postOrders = ( req, res, next)=>{
+    let fetchedCart;
+    req.user
+        .getCart()
+        .then(cart => {
+            fetchedCart = cart; // assign the fetched cart to the variable
+            return cart.getProducts(); // get the products in the cart
+        })
+        .then(products => {
+            return req.user
+                .createOrder() 
+                .then(order => {
+                    return order.addProducts(
+                         products.map(product => { // add the products to the order
+                        product.orderItem = { quantity: product.cartItem.quantity }; // set the quantity
+                        return product; // return the product
+                    }));
+                })
+                .catch(err => console.log(err));
+        })
+        .then(result => { 
+            return fetchedCart.setProducts(null); // clear the cart after placing the order
+        })
+        .then(() => {
+            res.redirect('/orders'); // redirect to the orders page
+        })
+        .catch(err => console.log(err)); // log any errors to the console
 }
+
+
+
+
 

@@ -9,18 +9,18 @@ const router = express.Router();
 
 router.get('/', shopController.getIndex); // use the getIndex method from the shop controller
 
-router.get('/products', shopController.getProducts); // use the getProducts method from the shop controller
+router.get('/products', shopController.getProducts); 
 
 router.get('/products/:productId', shopController.getProduct); 
 
-router.get('/cart', shopController.getCart); // use the getCart method from the shop controller
+router.get('/cart', shopController.getCart);
 
 router.post('/cart', shopController.postCart);
 
 router.post('/cart-delete-item', shopController.postCartDeleteProduct); 
 
-router.get('/orders', shopController.getOrders); // use the getOrders method from the shop controller
+router.post('/create-order', shopController.postOrders); 
 
-router.get('/checkout', shopController.getCheckout); // use the getCheckout method from the shop controller
+router.get('/orders', shopController.getOrders); 
 
 module.exports = router; // export the router

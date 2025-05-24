@@ -19,6 +19,9 @@ const Product = require('./models/product'); // import the Product model
 const User = require('./models/user'); // import the User model
 const Cart = require('./models/cart'); // import the Cart model
 const CartItem = require('./models/cart-item'); // import the CartItem model
+const Order = require('./models/order'); // import the Order model
+const OrderItem = require('./models/order-item'); // import the OrderItem model
+
 
 app.use(bodyParser.urlencoded({extended: false})); // use body-parser middleware to parse the request body
 
@@ -38,19 +41,24 @@ app.use(ShopRoutes); // use the shop routes for any request that starts with /sh
 
 app.use(errorController.getErrorPage); // end of middleware
 
+
+// define the relationships between the models
 Product.belongsTo(User, {constraints: true, onDelete: 'CASCADE'}); 
-
 User.hasMany(Product); // define the relationship between User and Product
-
 User.hasOne(Cart); // define the relationship between User and Cart
 Cart.belongsTo(User); // define the relationship between Cart and User
 Cart.belongsToMany(Product, {through: CartItem});
 Product.belongsToMany(Cart, {through: CartItem}); // define the relationship between Product and Cart through CartItem
+Order.belongsTo(User); // define the relationship between Order and User
+Order.belongsToMany(Product, {through: OrderItem}); 
+User.hasMany(Order); // define the relationship between User and Order
+
  
 
 
 sequelize
-    .sync() // sync the database, force: true will drop the table if it already exists
+    //.sync({force : true}) // sync the database, force: true will drop the table if it already exists
+    .sync()
     .then(
     result => {
         return User.findByPk(1); // find the user with id 1
