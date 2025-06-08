@@ -15,35 +15,16 @@ exports.getProducts = (req, res, next)=>{
 }
 
 exports.getProduct = (req, res, next)=>{
-
-    const prodId = req.params.productId; // get the product id from the request parameters
-    Product.findAll({ where: { id: prodId } })
-    .then(
-            products=> {
-                res.render('shop/product-detail', {
-                product: products[0], 
-                PageTitle:'products[0].title', // set the page title to the product title
-                path:'/products', 
-                })// render the shop view
-            })
-    .catch(err => console.log(err));
-     // find the product by id
-    // Note: Using findByPk is more efficient than findAll with where clause
-    // because it uses the primary key to find the product
-
-    /* Product.findByPk(prodId)
-    .then(
-        (product)=> {
+    const prodId = req.params.productId; // <-- Add this line
+    Product.findById(prodId)
+        .then(product => {
             res.render('shop/product-detail', {
-                product: product, // pass the product
-                PageTitle: product.title, // set the page title to the product title
-                path: '/products', // set the path to /products
-        }
-            ) // render the product detail view
+                product: product,
+                PageTitle: product.title,
+                path: '/products',
+            });
         })
-    .catch(
-        err => console.log(err)
-    ) */
+        .catch(err => console.log(err));
 }
 
 

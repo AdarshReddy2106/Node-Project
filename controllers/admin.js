@@ -1,5 +1,6 @@
 const Product = require('../models/product'); // import the Product model
 
+
 exports.getAddProduct = (req, res, next)=>{ 
     console.log('Middleware add product');
     res.render('admin/edit-product', {
@@ -16,7 +17,7 @@ exports.postAddProduct = (req, res, next) => {
     const imageUrl = req.body.imageUrl;
     const description = req.body.description; 
     const price = req.body.price;
-    const product = new Product(title, price, imageUrl, description); // create a new product instance
+    const product = new Product(title,  price, imageUrl, description); // create a new product instance
     product.save()
     .then(result => {
         console.log(result);
@@ -27,18 +28,16 @@ exports.postAddProduct = (req, res, next) => {
         console.log(err); // log the error to the console
     }) 
 };
- 
-/* exports.getEditProduct = (req, res, next)=>{ 
+
+exports.getEditProduct = (req, res, next)=>{ 
     console.log('Middleware add product');
     const editMode = req.query.edit; // get the edit mode from the query string
     if (!editMode) { // if edit mode is not set
         return res.redirect('/'); // redirect to the home page
     }
     const prodId = req.params.productId; // get the product id from the request parameters
-    req.user.getProducts({where: {id: prodId}}) // get the products for the user with the given id
-    // Product.findByPk(prodId)
-        .then(products=> { // find the product by id
-        const product = products[0]; // get the first product from the array of products
+    Product.findById(prodId)
+        .then(product=> { // find the product by id
         if (!product) { // if product is not found
             return res.redirect('/'); // redirect to the home page
         }
@@ -56,16 +55,17 @@ exports.postEditProduct = (req, res, next) => {
     const prodId = req.body.productId; // get the product id from the request body
     const updatedTitle = req.body.title; // get the updated title from the request body
     const updatedImageUrl = req.body.imageUrl; // get the updated image url from the request body
-    const updatedDescription = req.body.description; // get the updated description from the request body
     const updatedPrice = req.body.price; // get the updated price from the request body
-    Product.findByPk(prodId) // find the product by id
-        .then(product => { // if product is found
-        product.title = updatedTitle; // update the title
-        product.imageUrl = updatedImageUrl; // update the image url
-        product.description = updatedDescription; // update the description
-        product.price = updatedPrice; // update the price
-        return product.save(); // save the updated product
-    })
+    const updatedDescription = req.body.description; // get the updated description from the request body
+    
+    const product = new Product(
+        updatedTitle, 
+        updatedPrice,    
+        updatedImageUrl,
+        updatedDescription,
+        prodId
+    )
+    product.save()
         .then(result => {
             console.log('Updated Product'); // log the updated product to the console
             res.redirect('/admin/products'); // redirect to the admin products page
@@ -78,7 +78,7 @@ exports.postEditProduct = (req, res, next) => {
 
 
 exports.getProducts = (req, res, next) => {
-    req.user.getProducts() // get the products for the user
+    Product.fetchAll() // get the products for the user
         .then(products=> { // fetch all products from the product model
             res.render('admin/products', {
             prods: products,
@@ -92,14 +92,11 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId; // get the product id from the request body
-    Product.findByPk(prodId) // find the product by id
-        .then(product => { // if product is found
-        return product.destroy(); // destroy the product
-    })
-        .then(result => {
+    Product.deleteById(prodId)
+        .then(() => {
         console.log('Deleted Product'); // log the deleted product to the console
         res.redirect('/admin/products');
     })
         .catch(err => console.log(err)); // log any errors to the console
 }
- */
+
