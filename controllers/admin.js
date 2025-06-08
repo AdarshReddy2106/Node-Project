@@ -16,24 +16,19 @@ exports.postAddProduct = (req, res, next) => {
     const imageUrl = req.body.imageUrl;
     const description = req.body.description; 
     const price = req.body.price;
-    const Product = require('../models/product');
-    req.user.createProduct({ 
-        title: title, // create a new product with the given title
-        price: price, // set the price of the product
-        imageUrl: imageUrl, // set the image url of the product
-        description: description // set the description of the product
-    })
+    const product = new Product(title, price, imageUrl, description); // create a new product instance
+    product.save()
     .then(result => {
-        //console.log(result);
+        console.log(result);
         console.log('Created Product'); 
         res.redirect('/admin/products'); // redirect to the admin products page
     })
     .catch(err => {
         console.log(err); // log the error to the console
-    })
+    }) 
 };
-
-exports.getEditProduct = (req, res, next)=>{ 
+ 
+/* exports.getEditProduct = (req, res, next)=>{ 
     console.log('Middleware add product');
     const editMode = req.query.edit; // get the edit mode from the query string
     if (!editMode) { // if edit mode is not set
@@ -107,4 +102,4 @@ exports.postDeleteProduct = (req, res, next) => {
     })
         .catch(err => console.log(err)); // log any errors to the console
 }
-
+ */
