@@ -17,9 +17,9 @@ app.use(express.static(path.join(__dirname, 'public'))); // serve static files f
 app.use(bodyParser.urlencoded({extended: false})); // use body-parser middleware to parse the request body  
 
 app.use((req, res, next) => { // middleware to set the user object in the request
-    User.findById('6846ac1299c9e4d634f6420e') // find the user with id 1
+    User.findById('6846fca65f2b5036b4166bf6') // find the user with id 1
         .then(user => { // if user is found
-            req.user = user; // set the user object in the request
+            req.user = new User(user.name, user.email, user.cart, user._id); // set the user object in the request
             next(); // call the next middleware
         })
         .catch(err => console.log(err)); 
