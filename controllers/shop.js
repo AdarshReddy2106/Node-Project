@@ -1,10 +1,10 @@
-const Product = require('../models/product'); // import the Product model
-
+const Product = require('../models/product');
+const Order = require('../models/order');
 
 exports.getProducts = (req, res, next)=>{ 
     Product.find()
         .then(
-            products=> {
+           products=> {
                 res.render('shop/product-list', {
                 prods: products, 
                 PageTitle:'All Products', 
@@ -42,78 +42,88 @@ exports.getIndex = (req, res, next)=>{
 }
 
 
-exports.getCart = ( req, res, next)=>{
+exports.getCart = (req, res, next) => {
     req.user
-    .getCart()
-    .then(products =>{
-        
-        res.render('shop/cart', {
-        path:'/cart',
-        PageTitle:'Your Cart',
-        products: products,
-        })  
-})
-    .catch(err => console.log(err));
+        .populate('cart.items.productId')
+        .then(user => {
+            console.log('user.cart.items:', user.cart.items);
+            
+            // Map the cart items to create products array with quantity
+            const products = user.cart.items.map(item => {
+                return {
+                    ...item.productId._doc, // spread the product data
+                    quantity: item.quantity, // add the quantity from cart
+                    cartItemId: item._id // optional: include cart item id for delete operations
+                };
+            });
+            
+            res.render('shop/cart', {
+                path: '/cart',
+                PageTitle: 'Your Cart',
+                products: products,
+            });
+        })
+        .catch(err => {
+            console.log('Error in getCart:', err);
+            res.status(500).render('error', { 
+                error: 'Unable to load cart',
+                path: '/cart'
+            });
+        });
 }
 
-exports.postCart = ( req, res, next)=>{
+exports.postCart = (req, res, next) => {
     const prodId = req.body.productId; // get the product id from the request body
-    Product.findById(prodId).then(product=>{
-        req.user.addToCart(product);
-        res.redirect('/cart');
-    }).then(result=>{
-        console.log(result)
-    })
-    // let fetchedCart; // variable to hold the fetched cart
-    // let newQuantity = 1; // set the new quantity to 1
-    // req.user
-    //     .getCart()
-    //     .then(cart => {
-    //         fetchedCart = cart; // assign the fetched cart to the variable
-    //         return cart.getProducts({ where: { id: prodId } }); // get the products in the cart
-
-    //     })
-    //     .then(products => {
-    //         let product; // declare a variable to hold the product
-
-    //         if (products.length > 0) { // if the product is already in the cart
-    //             product = products[0]; // get the first product
-    //         }
-            
-    //         if (product) { // if the product is already in the cart
-    //             const oldQuantity = product.cartItem.quantity; // get the old quantity
-    //             newQuantity = oldQuantity + 1; // increment the quantity by 1
-    //             return fetchedCart.addProduct(product, { // add the product to the cart
-    //                 through: { quantity: newQuantity } // set the new quantity
-    //             });
-    //         }
-    //         return Product.findByPk(prodId) // find the product by id
-    //             .then(product => {
-    //                 return fetchedCart.addProduct(product, { // add the product to the cart
-    //                     through: { quantity: 1 } // set the quantity to 1
-    //                 });
-    //             }
-    //         ).catch(err => console.log(err));
-    //     })
-    //     .then(  () => {
-    //         res.redirect('/cart'); // redirect to the cart page
-    //     })
-    //     .catch(err => console.log(err)); // get the cart for the user
+    
+    // Check if user exists
+    if (!req.user) {
+        console.log('Error: req.user is null');
+        return res.status(401).redirect('/login'); // or handle as needed
+    }
+    
+    Product.findById(prodId)
+        .then(product => {
+            if (!product) {
+                throw new Error('Product not found');
+            }
+            return req.user.addToCart(product);
+        })
+        .then(result => {
+            console.log('Product added to cart:', result);
+            res.redirect('/cart');
+        })
+        .catch(err => {
+            console.log('Error in postCart:', err);
+            res.status(500).redirect('/'); // redirect to home on error
+        });
 }
 
 exports.postCartDeleteProduct = ( req, res, next)=>{
-
     const prodId = req.body.productId; 
+    
+    if (!req.user) {
+        console.log('Error: req.user is null');
+        return res.status(401).redirect('/login');
+    }
+    
     req.user
-    .deleteItemFromCart(prodId)
+    .removeFromCart(prodId)
     .then(result => {
         res.redirect('/cart'); // redirect to the cart page
     })
-    .catch(err => console.log(err)); // log any errors to the console
+    .catch(err => {
+        console.log('Error deleting from cart:', err);
+        res.redirect('/cart'); // redirect back to cart even on error
+    });
 }
 
 
 exports.getOrders = ( req, res, next)=>{
+    if (!req.user) {
+        console.log('Error: req.user is null');
+        return res.status(401).redirect('/login');
+    }
+    
     req.user
     .getOrders()
     .then(orders =>{
@@ -123,23 +133,44 @@ exports.getOrders = ( req, res, next)=>{
         orders: orders // pass the orders to the view
     })
 })
-    .catch(err=>(console.log(err))
-    
-); // render the cart view  
+    .catch(err=>{
+        console.log('Error fetching orders:', err);
+        res.status(500).render('shop/orders', {
+            path: '/orders',
+            PageTitle: 'Your Orders',
+            orders: []
+        });
+    }); 
 }  
 
 
 exports.postOrders = ( req, res, next)=>{
-    let fetchedCart;
     req.user
-        .addOrder()
-        .then(() => {
+        .populate('cart.items.productId')
+        .then(user => {
+            console.log('user.cart.items:', user.cart.items);
+            
+            // Map the cart items to create products array with quantity
+            const products = user.cart.items
+            .map(item => {
+                return {
+                    quantity: item.quantity, // add the quantity from cart
+                    product : item.productId
+                };
+            });
+            const order = new Order({
+                user:{
+                    name: req.user.name,
+                    userId : req.user 
+                },
+                products: products
+            })
+            return order.save( )
+            }).then(() => {
             res.redirect('/orders'); // redirect to the orders page
         })
-        .catch(err => console.log(err)); // log any errors to the console
+        .catch(err => {
+            console.log('Error creating order:', err);
+            res.redirect('/cart'); // redirect back to cart on error
+        });
 }
-
-
-
-
-

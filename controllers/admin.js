@@ -22,6 +22,7 @@ exports.postAddProduct = (req, res, next) => {
         price: price , 
         imageUrl: imageUrl, 
         description: description,
+        userId : req.user
         }); // create a new product instance
     product 
         .save()
@@ -84,8 +85,10 @@ exports.postEditProduct = (req, res, next) => {
 
 
 exports.getProducts = (req, res, next) => {
-    Product.find() // get the products for the user
+    Product.find()
+        // .populate('userId')
         .then(products=> { // fetch all products from the product model
+                console.log(products)
             res.render('admin/products', {
             prods: products,
             PageTitle: 'Admin Products',
