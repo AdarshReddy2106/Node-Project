@@ -7,7 +7,7 @@ const shopController = require('../controllers/shop');
 const router = express.Router();
 
 
-router.get('/', shopController.getIndex); // use the getIndex method from the shop controller
+/* router.get('/', shopController.getIndex); // use the getIndex method from the shop controller
 
 router.get('/products', shopController.getProducts); 
 
@@ -21,6 +21,6 @@ router.post('/cart-delete-item', shopController.postCartDeleteProduct);
 
 router.post('/create-order', shopController.postOrders); 
 
-router.get('/orders', shopController.getOrders);  
+router.get('/orders', shopController.getOrders);  */ 
 
 module.exports = router; // export the router

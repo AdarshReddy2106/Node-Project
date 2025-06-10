@@ -1,11 +1,11 @@
 const path = require('path'); // import path module
+const mongoose = require('mongoose')
 const express = require('express'); // import express
 const adminRoutes = require('./routes/admin'); // import the admin routes
 const ShopRoutes = require('./routes/shop');   // import the shop routes
 const bodyParser = require('body-parser'); // import body-parser
 
 const errorController = require('./controllers/error'); // import the controllers
-const mongoConnect = require('./helper/database').mongoConnect
 const User = require('./models/user')
 
 const app = express(); // create an instance of express
@@ -32,7 +32,12 @@ app.use(ShopRoutes);            // use the shop routes for any request that star
 
 app.use(errorController.getErrorPage); // end of middleware
 
-mongoConnect(() => { 
-    
-    app.listen(2005);
-}); // start the server on port 2005
+
+mongoose.connect('mongodb+srv://ADARSH:Adarsh%40100%25@cluster0.6anlhot.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0')
+    .then(result=>{
+        console.log('Connected to MongoDB');
+        app.listen(2005) // start the server on port 2005
+    })
+    .catch(err=>{
+        console.log(err)
+    })
