@@ -17,16 +17,22 @@ exports.postAddProduct = (req, res, next) => {
     const imageUrl = req.body.imageUrl;
     const description = req.body.description; 
     const price = req.body.price;
-    const product = new Product(title,  price, imageUrl, description, null, req.user._id); // create a new product instance
-    product.save()
-    .then(result => {
-        console.log(result);
-        console.log('Created Product'); 
-        res.redirect('/admin/products'); // redirect to the admin products page
-    })
-    .catch(err => {
-        console.log(err); // log the error to the console
-    }) 
+    const product = new Product({
+        title: title,  
+        price: price , 
+        imageUrl: imageUrl, 
+        description: description,
+        }); // create a new product instance
+    product 
+        .save()
+        .then(result => {
+            console.log(result);
+            console.log('Created Product'); 
+            res.redirect('/admin/products'); // redirect to the admin products page
+        })
+        .catch(err => {
+            console.log(err); // log the error to the console
+        }) 
 };
 
 exports.getEditProduct = (req, res, next)=>{ 
@@ -58,19 +64,19 @@ exports.postEditProduct = (req, res, next) => {
     const updatedPrice = req.body.price; // get the updated price from the request body
     const updatedDescription = req.body.description; // get the updated description from the request body
     
-    const product = new Product(
-        updatedTitle, 
-        updatedPrice,    
-        updatedImageUrl,
-        updatedDescription,
-        prodId
-    )
-    product.save()
-        .then(result => {
-            console.log('Updated Product'); // log the updated product to the console
-            res.redirect('/admin/products'); // redirect to the admin products page
-        })
-        .catch(err => console.log(err)); // log any errors to the console
+    Product.findById(prodId)
+        .then(product=>{
+            product.title = updatedTitle
+            product.imageUrl = updatedImageUrl
+            product.price = updatedPrice
+            product.description = updatedDescription
+            return product.save()
+            }) 
+            .then(result => {
+                console.log('Updated Product'); // log the updated product to the console
+                res.redirect('/admin/products'); // redirect to the admin products page
+            })
+            .catch(err => console.log(err)); // log any errors to the console
 }
 
 
@@ -78,7 +84,7 @@ exports.postEditProduct = (req, res, next) => {
 
 
 exports.getProducts = (req, res, next) => {
-    Product.fetchAll() // get the products for the user
+    Product.find() // get the products for the user
         .then(products=> { // fetch all products from the product model
             res.render('admin/products', {
             prods: products,
@@ -92,7 +98,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
     const prodId = req.body.productId; // get the product id from the request body
-    Product.deleteById(prodId)
+    Product.findByIdAndDelete(prodId)
         .then(() => {
         console.log('Deleted Product'); // log the deleted product to the console
         res.redirect('/admin/products');

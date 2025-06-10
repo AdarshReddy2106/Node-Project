@@ -7,13 +7,13 @@ const shopController = require('../controllers/shop');
 const router = express.Router();
 
 
-/* router.get('/', shopController.getIndex); // use the getIndex method from the shop controller
+router.get('/', shopController.getIndex); // use the getIndex method from the shop controller
 
 router.get('/products', shopController.getProducts); 
 
 router.get('/products/:productId', shopController.getProduct); 
 
-router.get('/cart', shopController.getCart);
+/* router.get('/cart', shopController.getCart);
 
 router.post('/cart', shopController.postCart);
 

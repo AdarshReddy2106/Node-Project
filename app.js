@@ -6,7 +6,7 @@ const ShopRoutes = require('./routes/shop');   // import the shop routes
 const bodyParser = require('body-parser'); // import body-parser
 
 const errorController = require('./controllers/error'); // import the controllers
-const User = require('./models/user')
+// const User = require('./models/user')
 
 const app = express(); // create an instance of express
 
@@ -16,14 +16,14 @@ app.set('views', 'views'); // set the views directory
 app.use(express.static(path.join(__dirname, 'public'))); // serve static files from the public directory
 app.use(bodyParser.urlencoded({extended: false})); // use body-parser middleware to parse the request body  
 
-app.use((req, res, next) => { // middleware to set the user object in the request
-    User.findById('6846fca65f2b5036b4166bf6') // find the user with id 1
-        .then(user => { // if user is found
-            req.user = new User(user.name, user.email, user.cart, user._id); // set the user object in the request
-            next(); // call the next middleware
-        })
-        .catch(err => console.log(err)); 
-}); // end of middleware 
+// app.use((req, res, next) => { // middleware to set the user object in the request
+//     User.findById('6846fca65f2b5036b4166bf6') // find the user with id 1
+//         .then(user => { // if user is found
+//             req.user = new User(user.name, user.email, user.cart, user._id); // set the user object in the request
+//             next(); // call the next middleware
+//         })
+//         .catch(err => console.log(err)); 
+// }); // end of middleware 
 
 app.use(express.static(path.join(__dirname, 'public'))); // serve static files from the public directory
 
