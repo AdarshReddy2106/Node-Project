@@ -1,5 +1,5 @@
 const Product = require('../models/product'); // import the Product model
-const Order = require('../models/order'); // import the Order model
+
 
 exports.getProducts = (req, res, next)=>{ 
     Product.fetchAll()
@@ -105,14 +105,7 @@ exports.postCartDeleteProduct = ( req, res, next)=>{
 
     const prodId = req.body.productId; 
     req.user
-    .getCart() // get the cart for the user
-    .then(cart => {
-        return cart.getProducts({ where: { id: prodId } }); // get the products in the cart
-    })
-    .then(products => {
-        const product = products[0]; // get the first product
-        return product.cartItem.destroy(); // delete the product from the cart
-    })
+    .deleteItemFromCart(prodId)
     .then(result => {
         res.redirect('/cart'); // redirect to the cart page
     })
@@ -122,7 +115,7 @@ exports.postCartDeleteProduct = ( req, res, next)=>{
 
 exports.getOrders = ( req, res, next)=>{
     req.user
-    .getOrders({ include: ['products'] }) // get the orders for the user, including the products
+    .getOrders()
     .then(orders =>{
         res.render('shop/orders', {
         path:'/orders',
@@ -139,26 +132,7 @@ exports.getOrders = ( req, res, next)=>{
 exports.postOrders = ( req, res, next)=>{
     let fetchedCart;
     req.user
-        .getCart()
-        .then(cart => {
-            fetchedCart = cart; // assign the fetched cart to the variable
-            return cart.getProducts(); // get the products in the cart
-        })
-        .then(products => {
-            return req.user
-                .createOrder() 
-                .then(order => {
-                    return order.addProducts(
-                         products.map(product => { // add the products to the order
-                        product.orderItem = { quantity: product.cartItem.quantity }; // set the quantity
-                        return product; // return the product
-                    }));
-                })
-                .catch(err => console.log(err));
-        })
-        .then(result => { 
-            return fetchedCart.setProducts(null); // clear the cart after placing the order
-        })
+        .addOrder()
         .then(() => {
             res.redirect('/orders'); // redirect to the orders page
         })
