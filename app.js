@@ -1,8 +1,11 @@
 const path = require('path'); // import path module
 const mongoose = require('mongoose')
 const express = require('express'); // import express
+
 const adminRoutes = require('./routes/admin'); // import the admin routes
 const ShopRoutes = require('./routes/shop');   // import the shop routes
+const authRoutes = require('./routes/auth');   
+
 const bodyParser = require('body-parser'); // import body-parser
 
 const errorController = require('./controllers/error'); // import the controllers
@@ -27,8 +30,9 @@ app.use((req, res, next) => { // middleware to set the user object in the reques
 
 app.use(express.static(path.join(__dirname, 'public'))); // serve static files from the public directory
 
-app.use('/admin', adminRoutes); // use the admin routes for any request that starts with /admin
+app.use('/admin', adminRoutes); 
 app.use(ShopRoutes);            // use the shop routes for any request that starts with /shop
+app.use(authRoutes)
 
 app.use(errorController.getErrorPage); // end of middleware
 
