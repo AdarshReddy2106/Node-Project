@@ -9,6 +9,7 @@ exports.getProducts = (req, res, next)=>{
                 prods: products, 
                 PageTitle:'All Products', 
                 path:'/products', 
+                isAuthenticated : req.isLoggedIn,
                 })// render the shop view
             })
     .catch(err => console.log(err));
@@ -22,6 +23,7 @@ exports.getProduct = (req, res, next)=>{
                 product: product,
                 PageTitle: product.title,
                 path: '/products',
+                isAuthenticated : req.isLoggedIn
             });
         })
         .catch(err => console.log(err));
@@ -36,6 +38,7 @@ exports.getIndex = (req, res, next)=>{
                     prods: products, // pass the products to the view
                     PageTitle:'Shop', // set the page title to All Products
                     path:'/', // set the path to /
+                    isAuthenticated : req.isLoggedIn
             }
         )})
         .catch(err => console.log(err));
@@ -61,13 +64,15 @@ exports.getCart = (req, res, next) => {
                 path: '/cart',
                 PageTitle: 'Your Cart',
                 products: products,
+                isAuthenticated : req.isLoggedIn
             });
         })
         .catch(err => {
             console.log('Error in getCart:', err);
             res.status(500).render('error', { 
                 error: 'Unable to load cart',
-                path: '/cart'
+                path: '/cart',
+                isAuthenticated : req.isLoggedIn
             });
         });
 }
@@ -128,7 +133,8 @@ exports.getOrders = ( req, res, next)=>{
         res.render('shop/orders', {
         path:'/orders',
         PageTitle:'Your Orders',
-        orders: orders // pass the orders to the view
+        orders: orders, // pass the orders to the view
+        isAuthenticated : req.isLoggedIn
     })
 })
     .catch(err=>{
@@ -136,7 +142,8 @@ exports.getOrders = ( req, res, next)=>{
         res.status(500).render('shop/orders', {
             path: '/orders',
             PageTitle: 'Your Orders',
-            orders: []
+            orders: [],
+            isAuthenticated : req.isLoggedIn
         });
     }); 
 }  

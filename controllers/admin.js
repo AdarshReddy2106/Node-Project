@@ -7,6 +7,7 @@ exports.getAddProduct = (req, res, next)=>{
         PageTitle:'Add Product', 
         path: '/admin/add-product',
         editing: false, // set editing to false to indicate that we are adding a new product
+        isAuthenticated : req.isLoggedIn
     }) // send a response to the client
 }
 
@@ -53,6 +54,7 @@ exports.getEditProduct = (req, res, next)=>{
         path: '/admin/edit-product',
         editing: editMode, // set the editing flag to true
         product: product, // pass the product to the view  
+        isAuthenticated : req.isLoggedIn
     }); // send a response to the client
 })
         .catch(err => console.log(err)); // find the product by id
@@ -93,6 +95,7 @@ exports.getProducts = (req, res, next) => {
             prods: products,
             PageTitle: 'Admin Products',
             path: '/admin/products',
+            isAuthenticated : req.isLoggedIn
         });
     })
         .catch(err => console.log(err)); // log any errors to the console
