@@ -123,9 +123,7 @@ exports.getOrders = ( req, res, next)=>{
         console.log('Error: req.user is null');
         return res.status(401).redirect('/login');
     }
-    
-    req.user
-    .getOrders()
+    Order.find({"user.userId": req.user._id}) 
     .then(orders =>{
         res.render('shop/orders', {
         path:'/orders',
@@ -155,7 +153,7 @@ exports.postOrders = ( req, res, next)=>{
             .map(item => {
                 return {
                     quantity: item.quantity, // add the quantity from cart
-                    product : item.productId
+                    product : {...item.productId._doc}
                 };
             });
             const order = new Order({
@@ -166,7 +164,11 @@ exports.postOrders = ( req, res, next)=>{
                 products: products
             })
             return order.save( )
-            }).then(() => {
+            })
+        .then(result => {
+            return req.user.clearCart()
+        }) 
+        .then(()=>{
             res.redirect('/orders'); // redirect to the orders page
         })
         .catch(err => {
