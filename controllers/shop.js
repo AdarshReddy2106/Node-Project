@@ -9,7 +9,7 @@ exports.getProducts = (req, res, next)=>{
                 prods: products, 
                 PageTitle:'All Products', 
                 path:'/products', 
-                isAuthenticated : req.isLoggedIn,
+                isAuthenticated : req.session.isLoggedIn,
                 })// render the shop view
             })
     .catch(err => console.log(err));
@@ -23,7 +23,7 @@ exports.getProduct = (req, res, next)=>{
                 product: product,
                 PageTitle: product.title,
                 path: '/products',
-                isAuthenticated : req.isLoggedIn
+                isAuthenticated :req.session.isLoggedIn,
             });
         })
         .catch(err => console.log(err));
@@ -38,7 +38,7 @@ exports.getIndex = (req, res, next)=>{
                     prods: products, // pass the products to the view
                     PageTitle:'Shop', // set the page title to All Products
                     path:'/', // set the path to /
-                    isAuthenticated : req.isLoggedIn
+                    isAuthenticated : req.session.isLoggedIn,
             }
         )})
         .catch(err => console.log(err));
@@ -64,7 +64,7 @@ exports.getCart = (req, res, next) => {
                 path: '/cart',
                 PageTitle: 'Your Cart',
                 products: products,
-                isAuthenticated : req.isLoggedIn
+                isAuthenticated : req.session.isLoggedIn
             });
         })
         .catch(err => {
@@ -72,7 +72,7 @@ exports.getCart = (req, res, next) => {
             res.status(500).render('error', { 
                 error: 'Unable to load cart',
                 path: '/cart',
-                isAuthenticated : req.isLoggedIn
+                isAuthenticated : req.session.isLoggedIn
             });
         });
 }
@@ -134,7 +134,7 @@ exports.getOrders = ( req, res, next)=>{
         path:'/orders',
         PageTitle:'Your Orders',
         orders: orders, // pass the orders to the view
-        isAuthenticated : req.isLoggedIn
+        isAuthenticated : req.session.isLoggedIn
     })
 })
     .catch(err=>{
@@ -143,7 +143,7 @@ exports.getOrders = ( req, res, next)=>{
             path: '/orders',
             PageTitle: 'Your Orders',
             orders: [],
-            isAuthenticated : req.isLoggedIn
+            isAuthenticated : req.session.isLoggedIn
         });
     }); 
 }  
