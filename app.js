@@ -58,19 +58,6 @@ app.use(errorController.getErrorPage); // end of middleware
 mongoose.connect(MONGODB_URI)
     .then(result=>{
         console.log('Connected to MongoDB');
-        User.findOne().then(user=>{
-            if (!user) {
-                const user = new User({
-                name: "Adarsh",
-                email: "adarsh@gmail.com",
-                cart: {
-                    items:[]
-                }
-            });
-            user.save();  
-            }
-        })
-
         app.listen(2005) // start the server on port 2005
     })
     .catch(err=>{
