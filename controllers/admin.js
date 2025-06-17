@@ -2,6 +2,9 @@ const Product = require('../models/product'); // import the Product model
 
 
 exports.getAddProduct = (req, res, next)=>{ 
+    if (!req.session.isLoggedIn) {
+        return res.redirect('/login')
+    }
     console.log('Middleware add product');
     res.render('admin/edit-product', {
         PageTitle:'Add Product', 

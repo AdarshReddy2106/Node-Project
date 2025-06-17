@@ -20,20 +20,34 @@ exports.getSignup = (req, res, next) => {
   });
 };
 
-exports.postLogin = ( req, res, next)=>{
-        
-        User.findById('684843a9e6a5c7b4f624d099') // find the user with id 1
-                .then(user => { // if user is found
-                    req.session.isLoggedIn = true;
-                    req.session.user = user;
-                    req.session.save(err=>{
-                        console.log('Error saving session:', err);
-                        res.redirect('/')
-                    })
-                    
+exports.postLogin = (req, res, next) => {
+    const email = req.body.email;
+    const password = req.body.password;
+    User.findOne({ email: email })
+        .then(user => {
+            if (!user) {
+                return res.redirect('/login');
+            }
+            bcrypt.compare(password, user.password)
+                .then(doMatch => {
+                    if (doMatch) {
+                        req.session.isLoggedIn = true;
+                        req.session.user = user;
+                        return req.session.save(err => {
+                            if (err) console.log('Error saving session:', err);
+                            res.redirect('/');
+                        });
+                    }
+                    // If password does not match
+                    return res.redirect('/login');
                 })
-                .catch(err => console.log(err));  
-}  
+                .catch(err => {
+                    console.log(err);
+                    res.redirect('/login');
+                });
+        })
+        .catch(err => console.log(err));
+};  
 
 exports.postSignup = (req, res, next) => {
     const email = req.body.email;

@@ -35,12 +35,13 @@ app.use(session({
 
 app.use((req, res, next) => {
     if (!req.session.user) {
-        console.log('No user in session');
+        // console.log('No user in session');
         return next(); // if user is not found, go to next middleware
     }
     User.findById(req.session.user._id) // find the user with id 1
         .then(user => { // if user is found
             req.user = user;
+            req.session.user = user;
             next();
         })
         .catch(err => console.log(err));  
