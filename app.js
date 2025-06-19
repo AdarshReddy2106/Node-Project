@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const express = require('express'); // import express
 const session = require('express-session')
 const MongoDBStore = require('connect-mongodb-session')(session) 
+const csrf = require('csurf')
 
 const adminRoutes = require('./routes/admin'); // import the admin routes
 const ShopRoutes = require('./routes/shop');   // import the shop routes
@@ -21,6 +22,8 @@ const store =new MongoDBStore({
     collection: 'sessions'
 });
 
+const csrfProtection = csrf();
+
 app.set('view engine', 'ejs'); // set the view engine to handlebars
 app.set('views', 'views'); // set the views directory
 
@@ -32,6 +35,8 @@ app.use(session({
     saveUninitialized: false,
     store: store,
 }))
+
+app.use(csrfProtection); // use csrf protection middleware
 
 app.use((req, res, next) => {
     if (!req.session.user) {
@@ -47,7 +52,14 @@ app.use((req, res, next) => {
         .catch(err => console.log(err));  
 } )
 
+
 app.use(express.static(path.join(__dirname, 'public'))); // serve static files from the public directory
+
+app.use((req, res, next) => {
+    res.locals.isAuthenticated = req.session.isLoggedIn; // set isAuthenticated to true if user is logged in
+    res.locals.csrfToken = req.csrfToken();
+    next();
+});
 
 app.use('/admin', adminRoutes); 
 app.use(ShopRoutes);            // use the shop routes for any request that starts with /shop

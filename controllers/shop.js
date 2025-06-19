@@ -10,13 +10,14 @@ exports.getProducts = (req, res, next)=>{
                 PageTitle:'All Products', 
                 path:'/products', 
                 isAuthenticated : req.session.isLoggedIn,
-                })// render the shop view
+                csrfToken: req.csrfToken() // <-- ADD THIS
+                })
             })
     .catch(err => console.log(err));
 }
 
 exports.getProduct = (req, res, next)=>{
-    const prodId = req.params.productId; // <-- Add this line
+    const prodId = req.params.productId;
     Product.findById(prodId)
         .then(product => {
             res.render('shop/product-detail', {
@@ -24,23 +25,24 @@ exports.getProduct = (req, res, next)=>{
                 PageTitle: product.title,
                 path: '/products',
                 isAuthenticated :req.session.isLoggedIn,
+                csrfToken: req.csrfToken() // <-- ADD THIS
             });
         })
         .catch(err => console.log(err));
 }
-
 
 exports.getIndex = (req, res, next)=>{
     Product.find()
         .then(
             products=> {
                 res.render('shop/index', {
-                    prods: products, // pass the products to the view
-                    PageTitle:'Shop', // set the page title to All Products
-                    path:'/', // set the path to /
-                    isAuthenticated : req.session.isLoggedIn,
-            }
-        )})
+                    prods: products,
+                    PageTitle:'Shop',
+                    path:'/',
+                    isAuthenticated: req.session.isLoggedIn,
+                    csrfToken: req.csrfToken() // <-- ADD THIS
+                });
+            })
         .catch(err => console.log(err));
 }
 
@@ -165,7 +167,7 @@ exports.postOrders = ( req, res, next)=>{
             });
             const order = new Order({
                 user:{
-                    name: req.user.name,
+                    email : req.user.email, // use req.user.email to get the email of the user
                     userId : req.user 
                 },
                 products: products

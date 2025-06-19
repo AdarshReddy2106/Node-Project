@@ -8,7 +8,8 @@ exports.getLogin = ( req, res, next)=>{
         res.render('auth/login', {
         path:'/login',
         PageTitle:'Login',
-        isAuthenticated: false
+        isAuthenticated: false,
+        csrfToken: req.csrfToken() // <-- ADD THIS
     })
 }  
 
@@ -16,7 +17,8 @@ exports.getSignup = (req, res, next) => {
   res.render('auth/signup', {
     path: '/signup',
     PageTitle: 'Signup',
-    isAuthenticated: false
+    isAuthenticated: false,
+    csrfToken: req.csrfToken() // <-- ADD THIS
   });
 };
 
@@ -63,7 +65,7 @@ exports.postSignup = (req, res, next) => {
                     const user = new User({
                         email: email,
                         password: hashedPassword,
-                        cart: {item:[]}
+                        cart: {items: []}
                     })
                     return user.save()
                 })
