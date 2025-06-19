@@ -3,22 +3,26 @@ const bcrypt = require('bcryptjs')
 const User = require('../models/user')
 
 exports.getLogin = ( req, res, next)=>{
-        // const isLoggedIn = req.get('Cookie').split('=')[1];
-        console.log(req.session.isLoggedIn)
-        res.render('auth/login', {
+    const message = req.flash('error');
+    res.render('auth/login', {
         path:'/login',
         PageTitle:'Login',
-        isAuthenticated: false,
-        csrfToken: req.csrfToken() // <-- ADD THIS
-    })
+        errorMessage: message.length > 0 ? message[0] : null, 
+        csrfToken: req.csrfToken()
+    }) 
 }  
 
 exports.getSignup = (req, res, next) => {
+    let message = req.flash('error');
+    if (message.length > 0) {
+        message = message[0]; // Get the first error message
+    }
   res.render('auth/signup', {
     path: '/signup',
     PageTitle: 'Signup',
     isAuthenticated: false,
-    csrfToken: req.csrfToken() // <-- ADD THIS
+    errorMessage: message,
+    csrfToken: req.csrfToken()
   });
 };
 
@@ -28,6 +32,7 @@ exports.postLogin = (req, res, next) => {
     User.findOne({ email: email })
         .then(user => {
             if (!user) {
+                req.flash('error', 'Invalid email or password.');
                 return res.redirect('/login');
             }
             bcrypt.compare(password, user.password)
@@ -41,6 +46,7 @@ exports.postLogin = (req, res, next) => {
                         });
                     }
                     // If password does not match
+                    req.flash('error', 'Invalid email or password.');
                     return res.redirect('/login');
                 })
                 .catch(err => {
@@ -57,6 +63,11 @@ exports.postSignup = (req, res, next) => {
     const confirmPassword = req.body.confirmPassword;
     User.findOne({email:email})
             .then(userDoc=>{
+                req.flash('error', 'Email already exists. Please use a different email.');
+                if (password !== confirmPassword) {
+                    req.flash('error', 'Passwords do not match. Please try again.');
+                    return res.redirect('/signup');
+                }
                 if (userDoc) {  //if user exists we dont want to create new one with same email
                     return res.redirect('/signup')
                 }

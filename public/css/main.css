@@ -195,6 +195,14 @@ form {
   color: white;
 }
 
+.error-message {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+
 @media (min-width: 768px) {
   .main-header__nav {
     display: flex;

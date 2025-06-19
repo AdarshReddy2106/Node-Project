@@ -9,8 +9,6 @@ exports.getProducts = (req, res, next)=>{
                 prods: products, 
                 PageTitle:'All Products', 
                 path:'/products', 
-                isAuthenticated : req.session.isLoggedIn,
-                csrfToken: req.csrfToken() // <-- ADD THIS
                 })
             })
     .catch(err => console.log(err));
@@ -24,8 +22,6 @@ exports.getProduct = (req, res, next)=>{
                 product: product,
                 PageTitle: product.title,
                 path: '/products',
-                isAuthenticated :req.session.isLoggedIn,
-                csrfToken: req.csrfToken() // <-- ADD THIS
             });
         })
         .catch(err => console.log(err));
@@ -39,8 +35,6 @@ exports.getIndex = (req, res, next)=>{
                     prods: products,
                     PageTitle:'Shop',
                     path:'/',
-                    isAuthenticated: req.session.isLoggedIn,
-                    csrfToken: req.csrfToken() // <-- ADD THIS
                 });
             })
         .catch(err => console.log(err));
@@ -66,7 +60,6 @@ exports.getCart = (req, res, next) => {
                 path: '/cart',
                 PageTitle: 'Your Cart',
                 products: products,
-                isAuthenticated : req.session.isLoggedIn
             });
         })
         .catch(err => {
@@ -74,7 +67,6 @@ exports.getCart = (req, res, next) => {
             res.status(500).render('error', { 
                 error: 'Unable to load cart',
                 path: '/cart',
-                isAuthenticated : req.session.isLoggedIn
             });
         });
 }
@@ -135,8 +127,7 @@ exports.getOrders = ( req, res, next)=>{
         res.render('shop/orders', {
         path:'/orders',
         PageTitle:'Your Orders',
-        orders: orders, // pass the orders to the view
-        isAuthenticated : req.session.isLoggedIn
+        orders: orders, 
     })
 })
     .catch(err=>{
@@ -145,7 +136,6 @@ exports.getOrders = ( req, res, next)=>{
             path: '/orders',
             PageTitle: 'Your Orders',
             orders: [],
-            isAuthenticated : req.session.isLoggedIn
         });
     }); 
 }  
