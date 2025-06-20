@@ -1,15 +1,6 @@
 const bcrypt = require('bcryptjs')
 
-const nodemailer = require('nodemailer')
-const sendgridTransport = require('nodemailer-sendgrid-transport')
-
 const User = require('../models/user')
-
-const transporter = nodemailer.createTransport(sendgridTransport({
-    auth : {
-        api_key : process.env.SENDGRID_API_KEY
-    }
-}))
 
 exports.getLogin = ( req, res, next)=>{
     const message = req.flash('error');
@@ -70,41 +61,35 @@ exports.postSignup = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
     const confirmPassword = req.body.confirmPassword;
-
-    if (password !== confirmPassword) {
-        req.flash('error', 'Passwords do not match. Please try again.');
-        return res.redirect('/signup');
-    }
-
-    User.findOne({ email: email })
-        .then(userDoc => {
-            if (userDoc) {
+    User.findOne({email:email})
+            .then(userDoc=>{
                 req.flash('error', 'Email already exists. Please use a different email.');
-                return res.redirect('/signup');
-            }
-            return bcrypt.hash(password, 12)
-                .then(hashedPassword => {
+                if (password !== confirmPassword) {
+                    req.flash('error', 'Passwords do not match. Please try again.');
+                    return res.redirect('/signup');
+                }
+                if (userDoc) {  //if user exists we dont want to create new one with same email
+                    return res.redirect('/signup')
+                }
+            return bcrypt.hash(password, 12 )
+                .then(hashedPassword=>{
                     const user = new User({
                         email: email,
                         password: hashedPassword,
-                        cart: { items: [] }
-                    });
-                    return user.save();
+                        cart: {items: []}
+                    })
+                    return user.save()
                 })
-                .then(result => {
-                    res.redirect('/login');
-                    return transporter.sendMail({
-                        to: email,
-                        from: 'shop@node.com',
-                        subject: 'Signup Successful',
-                        text: 'Welcome to our application!'
-                    });
-                });
+                       
+            .then(result=>{
+                res.redirect('/login')
+            })
+            })
+            
+        .catch(err=>{
+            console.log(err)
         })
-        .catch(err => {
-            console.log(err);
-            res.redirect('/signup');
-        });
+
 };
 
 exports.postLogout = ( req, res, next)=>{
